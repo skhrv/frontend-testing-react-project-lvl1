@@ -1,13 +1,22 @@
 // @ts-check
 /* eslint-disable import/prefer-default-export */
-import { parse } from 'url';
+import { parse, resolve } from 'path';
+import { URL } from 'url';
+
+/**
+ * @param {string} pathname
+ */
+const omitExtFromPath = (pathname) => {
+  const { dir, name } = parse(pathname);
+  return resolve(dir, name);
+};
 
 /**
  * @param {string} url
  */
-export const getFileNameFromUrl = (url) => {
-  const { host, path } = parse(url);
-  const fileName = `${host}${path}`.replace(/\W+/g, '-');
+export const getNameFromUrl = (url) => {
+  const { host, pathname } = new URL(url);
+  const name = `${host}${omitExtFromPath(pathname)}`.replace(/(?=\/$)\W/g, '').replace(/\W+/g, '-');
 
-  return `${fileName}.html`;
+  return name;
 };

@@ -1,12 +1,14 @@
 // @ts-check
+import axios from 'axios';
 import cheerio from 'cheerio';
-import { isEmpty } from 'lodash-es';
-import { format, resolve } from 'path';
+import {
+  extname, format, join, resolve,
+} from 'path';
 import { URL } from 'url';
-import loadHtml from './loadHtml.js';
-import { loadImage } from './loadImages.js';
-import { saveFile, saveImages } from './saveFile.js';
-import { getNameFromUrl } from './utils.js';
+import { promises as fs } from 'fs';
+import saveFile from './saveFile.js';
+import { getResourceUrlAttr, getNameFromUrl, isLocalURL } from './utils.js';
+
 /**
  * @param {string} url
  * @param {string} outputPath
@@ -14,35 +16,56 @@ import { getNameFromUrl } from './utils.js';
 export default (url, outputPath) => {
   const baseName = getNameFromUrl(url);
   const originUrl = new URL(url).origin;
-  return loadHtml(url).then((html) => {
+  return axios(url).then(({ data: html }) => {
+    const $ = cheerio.load(html);
     const pathToHtml = format({
       dir: outputPath,
       name: baseName,
       ext: '.html',
     });
-    const $ = cheerio.load(html);
+
     const images = $('img');
-    if (images.length === 0) {
+    const links = $('link');
+    const scripts = $('script');
+    const resources = [...images, ...links, ...scripts];
+    const localResources = resources.filter((resource) => {
+      const linkAttr = getResourceUrlAttr(resource.tagName);
+      return isLocalURL(resource.attribs[linkAttr], originUrl);
+    });
+
+    if (localResources.length === 0) {
       return saveFile(pathToHtml, html).then(() => html);
     }
+
     const filesDirName = `${baseName}_files`;
     const filesDirPath = resolve(outputPath, filesDirName);
 
     return Promise.all(
-      images.map((_, image) => loadImage(image, originUrl, filesDirName)
-        .then((loadedImage) => {
-          // @ts-ignore
-          // eslint-disable-next-line no-param-reassign
-          image.attribs.src = loadedImage.localPath;
-          return loadedImage;
-        })),
-    )
-      .then((loadedImages) => {
-        if (isEmpty(loadedImages)) {
-          return Promise.resolve();
-        }
+      localResources.map((resource) => {
+        const linkAttr = getResourceUrlAttr(resource.tagName);
+        const resourceUrl = resource.attribs[linkAttr];
+        const fullURL = new URL(resourceUrl, originUrl).toString();
 
-        return saveImages(loadedImages, filesDirPath).then(() => saveFile(pathToHtml, $.html()));
-      });
-  }).catch(() => {});
+        const fileName = getNameFromUrl(fullURL);
+        const ext = extname(fullURL) || '.html';
+        const fullFileName = format({ name: fileName, ext });
+        const localPath = join(filesDirName, fullFileName);
+        // eslint-disable-next-line no-param-reassign
+        resource.attribs[linkAttr] = localPath;
+
+        const pathToResource = format({
+          dir: filesDirPath,
+          name: fileName,
+          ext,
+        });
+        return axios(fullURL, { responseType: 'arraybuffer' }).then(({ data }) => {
+          fs.mkdir(filesDirPath, { recursive: true }).then(() => {
+            saveFile(pathToResource, data);
+          });
+        });
+      }),
+    ).then(() => saveFile(pathToHtml, $.html()));
+  }).catch((e) => {
+    console.log(e);
+  });
 };

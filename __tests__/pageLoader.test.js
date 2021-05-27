@@ -22,7 +22,6 @@ const expectedImgFileName = 'ru-hexlet-io-assets-professions-nodejs.png';
 const expectedCssFileName = 'ru-hexlet-io-assets-application.css';
 const expectedScriptFileName = 'ru-hexlet-io-packs-js-runtime.js';
 
-
 let tempDirPath;
 let beforeHtml;
 let imgFile;

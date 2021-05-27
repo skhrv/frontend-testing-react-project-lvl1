@@ -1,6 +1,7 @@
 // @ts-check
 import axios from 'axios';
 import cheerio from 'cheerio';
+import debug from 'debug';
 import {
   extname, format, join, resolve,
 } from 'path';
@@ -8,6 +9,9 @@ import { URL } from 'url';
 import { promises as fs } from 'fs';
 import saveFile from './saveFile.js';
 import { getResourceUrlAttr, getNameFromUrl, isLocalURL } from './utils.js';
+import 'axios-debug-log';
+
+const log = debug('page-loader');
 
 /**
  * @param {string} url
@@ -47,7 +51,7 @@ export default (url, outputPath) => {
         const fullURL = new URL(resourceUrl, originUrl).toString();
 
         const fileName = getNameFromUrl(fullURL);
-        const ext = extname(fullURL) || '.html';
+        const ext = extname(resourceUrl) || '.html';
         const fullFileName = format({ name: fileName, ext });
         const localPath = join(filesDirName, fullFileName);
         // eslint-disable-next-line no-param-reassign
@@ -58,14 +62,9 @@ export default (url, outputPath) => {
           name: fileName,
           ext,
         });
-        return axios(fullURL, { responseType: 'arraybuffer' }).then(({ data }) => {
-          fs.mkdir(filesDirPath, { recursive: true }).then(() => {
-            saveFile(pathToResource, data);
-          });
-        });
+        return axios(fullURL, { responseType: 'arraybuffer' }).then(({ data }) => fs.mkdir(filesDirPath, { recursive: true }).then(() => saveFile(pathToResource, data))
+          .catch((e) => log(e, filesDirPath, pathToResource)));
       }),
     ).then(() => saveFile(pathToHtml, $.html()));
-  }).catch((e) => {
-    console.log(e);
-  });
+  }).catch((e) => log(e));
 };

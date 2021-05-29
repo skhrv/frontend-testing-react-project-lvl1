@@ -1,4 +1,3 @@
-import { test, expect, beforeAll } from '@jest/globals';
 import { promises as fs } from 'fs';
 import path from 'path';
 import axiosHttpAdapter from 'axios/lib/adapters/http';
@@ -38,41 +37,55 @@ beforeAll(async () => {
   tempDirPath = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
 });
 
-test('page loaded and saved with resources', async () => {
-  const scope = nock('https://ru.hexlet.io')
-    .get('/courses')
-    .times(2)
-    .reply(200, beforeHtml)
-    .get('/assets/professions/nodejs.png')
-    .reply(200, imgFile)
-    .get('/packs/js/runtime.js')
-    .reply(200, scriptFile)
-    .get('/assets/application.css')
-    .reply(200, cssFile);
-  await pageLoader('https://ru.hexlet.io/courses', tempDirPath);
-  scope.isDone();
+describe('pageLoader', () => {
+  it('page loaded and saved with resources', async () => {
+    const scope = nock('https://ru.hexlet.io')
+      .get('/courses')
+      .times(2)
+      .reply(200, beforeHtml)
+      .get('/assets/professions/nodejs.png')
+      .reply(200, imgFile)
+      .get('/packs/js/runtime.js')
+      .reply(200, scriptFile)
+      .get('/assets/application.css')
+      .reply(200, cssFile);
+    await pageLoader('https://ru.hexlet.io/courses', tempDirPath);
+    scope.isDone();
 
-  const actualHtml = await fs.readFile(
-    path.join(tempDirPath, expectedHtmlFileName),
-    'utf-8',
-  );
-  expect(actualHtml).toEqual(expectedHtml);
+    const actualHtml = await fs.readFile(
+      path.join(tempDirPath, expectedHtmlFileName),
+      'utf-8',
+    );
+    expect(actualHtml).toEqual(expectedHtml);
 
-  const actualImgFile = await fs.readFile(
-    path.join(tempDirPath, expectedDirName, expectedImgFileName),
-    'utf-8',
-  );
-  expect(actualImgFile).toEqual(imgFile);
+    const actualImgFile = await fs.readFile(
+      path.join(tempDirPath, expectedDirName, expectedImgFileName),
+      'utf-8',
+    );
+    expect(actualImgFile).toEqual(imgFile);
 
-  const actualScriptFile = await fs.readFile(
-    path.join(tempDirPath, expectedDirName, expectedScriptFileName),
-    'utf-8',
-  );
-  expect(actualScriptFile).toEqual(scriptFile);
+    const actualScriptFile = await fs.readFile(
+      path.join(tempDirPath, expectedDirName, expectedScriptFileName),
+      'utf-8',
+    );
+    expect(actualScriptFile).toEqual(scriptFile);
 
-  const actualCssFile = await fs.readFile(
-    path.join(tempDirPath, expectedDirName, expectedCssFileName),
-    'utf-8',
-  );
-  expect(actualCssFile).toEqual(cssFile);
+    const actualCssFile = await fs.readFile(
+      path.join(tempDirPath, expectedDirName, expectedCssFileName),
+      'utf-8',
+    );
+    expect(actualCssFile).toEqual(cssFile);
+  });
+
+  it('throw error if page not exist', async () => {
+    const scope = nock('https://ru.hexlet.io')
+      .get('/courses').reply(500);
+
+    await expect(pageLoader('https://ru.hexlet.io/courses', tempDirPath)).rejects.toThrowError('Request failed with status code 500');
+    scope.isDone();
+  });
+
+  it('throw error if output dit not exist', async () => {
+    await expect(pageLoader('https://ru.hexlet.io/courses', 'notExistedDir')).rejects.toThrowError('ENOENT: no such file or directory, access \'notExistedDir\'');
+  });
 });

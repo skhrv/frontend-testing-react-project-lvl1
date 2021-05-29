@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Page loader",
   "bin": {
-    "pageLoader": "bin/nodejs-package.js"
+    "pageLoader": "bin/pageLoader.js"
   },
   "engines": {
     "node": ">=14"
@@ -24,6 +24,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "axios-debug-log": "^0.8.2",
+    "chalk": "^4.1.1",
     "cheerio": "^1.0.0-rc.6",
     "commander": "^7.2.0",
     "debug": "^4.3.1",

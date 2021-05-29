@@ -1,5 +1,6 @@
 // @ts-check
 /* eslint-disable import/prefer-default-export */
+import debug from 'debug';
 import { isUndefined } from 'lodash-es';
 import { parse, resolve } from 'path';
 import { URL } from 'url';
@@ -47,3 +48,5 @@ export const getResourceUrlAttr = (tagName) => {
       throw new Error(`link attr not specified for ${tagName}`);
   }
 };
+
+export const log = debug('page-loader');

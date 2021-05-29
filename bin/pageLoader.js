@@ -7,4 +7,5 @@ program.option('-o, --output <type>', 'path to save file', process.cwd());
 
 program.parse(process.argv);
 const options = program.opts();
-pageLoader(program.args[0], options.output);
+pageLoader(program.args[0], options.output)
+  .then(() => process.exit(0)).catch(() => process.exit(1));

@@ -90,7 +90,7 @@ export default (url, outputPath) => {
         });
     })).catch((e) => {
       log(e);
-      console.error(e);
+      console.error(e.message);
       throw e;
     });
 };

@@ -5,6 +5,7 @@
   "bin": {
     "pageLoader": "bin/pageLoader.js"
   },
+  "main": "src/index.js",
   "engines": {
     "node": ">=14"
   },

@@ -22,7 +22,7 @@ const greenCheckChar = chalk.green('\u2705 ');
  * @param {string} url
  * @param {string} outputPath
  */
-export default (url, outputPath) => {
+export default (url, outputPath = './') => {
   const baseName = getNameFromUrl(url);
   const originUrl = new URL(url).origin;
   return fs

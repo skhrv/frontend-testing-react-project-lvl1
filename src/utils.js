@@ -1,7 +1,6 @@
 // @ts-check
 /* eslint-disable import/prefer-default-export */
 import debug from 'debug';
-import { isUndefined } from 'lodash-es';
 import { parse, resolve } from 'path';
 import { URL } from 'url';
 
@@ -28,7 +27,7 @@ export const getNameFromUrl = (url) => {
  * @param {string} origin
  */
 export const isLocalURL = (url, origin) => {
-  if (isUndefined(url)) {
+  if (url === undefined) {
     return false;
   }
   return new URL(origin).origin === new URL(url, origin).origin;

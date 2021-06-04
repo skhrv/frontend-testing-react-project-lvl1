@@ -86,7 +86,7 @@ describe('pageLoader', () => {
   });
 
   it('throw error if output dir is not accessible', async () => {
-    await fs.chmod(outPutTempDirPath, 0);
+    await fs.chmod(outPutTempDirPath, '0000');
     await initMockHttpRequests();
     await expect(
       fs.access(outPutTempDirPath, 7),

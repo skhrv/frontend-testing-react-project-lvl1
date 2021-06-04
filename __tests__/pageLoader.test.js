@@ -1,4 +1,4 @@
-import { promises as fs } from 'fs';
+import { promises as fs, constants } from 'fs';
 import path from 'path';
 import nock from 'nock';
 import os from 'os';
@@ -88,7 +88,7 @@ describe('pageLoader', () => {
   it('throw error if output dir is not accessible', async () => {
     await fs.chmod(outPutTempDirPath, '0000');
     await expect(
-      fs.access(outPutTempDirPath, fs.constants.W_OK),
+      fs.access(outPutTempDirPath, constants.W_OK),
     ).rejects.toThrowError(
       /EACCES: permission denied/,
     );

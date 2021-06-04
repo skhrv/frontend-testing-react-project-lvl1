@@ -87,6 +87,7 @@ describe('pageLoader', () => {
 
   it('throw error if output dir is not accessible', async () => {
     await fs.chmod(tempDirPath, 0);
+    await initMockHttpRequests();
     await expect(
       pageLoader('https://ru.hexlet.io/courses', tempDirPath),
     ).rejects.toThrowError(

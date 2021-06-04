@@ -39,9 +39,9 @@ beforeAll(async () => {
   expectedHtml = await readFile(expectedFixtureDirName, htmlFileName);
 });
 
-let tempDirPath;
+let outPutTempDirPath;
 beforeEach(async () => {
-  tempDirPath = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
+  outPutTempDirPath = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
 });
 
 describe('pageLoader', () => {
@@ -50,18 +50,18 @@ describe('pageLoader', () => {
     async (fileName, _, expectedFileName) => {
       const resourceData = await readFile(beforeFixtureDirName, fileName);
       const scope = await initMockHttpRequests();
-      await pageLoader('https://ru.hexlet.io/courses', tempDirPath);
+      await pageLoader('https://ru.hexlet.io/courses', outPutTempDirPath);
       scope.isDone();
 
       const actualHtml = await fs.readFile(
-        path.join(tempDirPath, expectedHtmlFileName),
+        path.join(outPutTempDirPath, expectedHtmlFileName),
         'utf-8',
       );
 
       expect(actualHtml).toEqual(expectedHtml);
 
       const actualResource = await fs.readFile(
-        path.join(tempDirPath, expectedDirName, expectedFileName),
+        path.join(outPutTempDirPath, expectedDirName, expectedFileName),
         'utf-8',
       );
       expect(actualResource).toEqual(resourceData);
@@ -72,7 +72,7 @@ describe('pageLoader', () => {
     const scope = nock('https://ru.hexlet.io').get('/courses').reply(500);
 
     await expect(
-      pageLoader('https://ru.hexlet.io/courses', tempDirPath),
+      pageLoader('https://ru.hexlet.io/courses', outPutTempDirPath),
     ).rejects.toThrowError('Request failed with status code 500');
     scope.isDone();
   });
@@ -86,12 +86,17 @@ describe('pageLoader', () => {
   });
 
   it('throw error if output dir is not accessible', async () => {
-    await fs.chmod(tempDirPath, 0);
+    await fs.chmod(outPutTempDirPath, 0);
     await initMockHttpRequests();
     await expect(
-      pageLoader('https://ru.hexlet.io/courses', tempDirPath),
+      fs.access(outPutTempDirPath, 7),
     ).rejects.toThrowError(
-      // /EACCES: permission denied/,
+      /EACCES: permission denied/,
+    );
+    await expect(
+      pageLoader('https://ru.hexlet.io/courses', outPutTempDirPath),
+    ).rejects.toThrowError(
+      /EACCES: permission denied/,
     );
   });
 });

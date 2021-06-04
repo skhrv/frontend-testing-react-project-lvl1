@@ -86,7 +86,7 @@ describe('pageLoader', () => {
   });
 
   it('throw error if output dir is not accessible', async () => {
-    await fs.chmod(outPutTempDirPath, constants.S_IRUSR);
+    await fs.chmod(outPutTempDirPath, 0o000);
     await expect(
       fs.access(outPutTempDirPath, constants.W_OK),
     ).rejects.toThrowError(

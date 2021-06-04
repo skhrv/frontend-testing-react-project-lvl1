@@ -6,7 +6,7 @@ import {
 } from 'path';
 import chalk from 'chalk';
 import { URL } from 'url';
-import { promises as fs } from 'fs';
+import { constants, promises as fs } from 'fs';
 import saveFile from './saveFile.js';
 import {
   getResourceUrlAttr,
@@ -26,7 +26,7 @@ export default (url, outputPath = process.cwd()) => {
   const baseName = getNameFromUrl(url);
   const originUrl = new URL(url).origin;
   return fs
-    .access(outputPath)
+    .access(outputPath, constants.W_OK)
     .then(() => axios(url).then(({ data: html }) => {
       log(`${url} was successfully loaded`);
       const $ = cheerio.load(html);

@@ -86,9 +86,9 @@ describe('pageLoader', () => {
   });
 
   it('throw error if output dir is not accessible', async () => {
-    await fs.chmod(outPutTempDirPath, '0000');
+    await fs.chmod(outPutTempDirPath, constants.S_IRUSR);
     await expect(
-      fs.readdir(outPutTempDirPath),
+      fs.access(outPutTempDirPath, constants.W_OK),
     ).rejects.toThrowError(
       /EACCES: permission denied/,
     );

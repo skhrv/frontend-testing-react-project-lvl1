@@ -91,8 +91,7 @@ describe('pageLoader', () => {
     const { mode: mode2 } = await fs.stat(outputTempDirPath);
     expect(parseInt(mode1.toString(8), 10)).toBe(40700);
     expect(parseInt(mode2.toString(8), 10)).toBe(40000);
-    expect(process.getuid()).toBe(0);
-    await expect(fs.access(outputTempDirPath, 2)).rejects.toThrowError(
+    await expect(fs.access('/usr', 2)).rejects.toThrowError(
       /EACCES: permission denied/,
     );
     // await initMockHttpRequests();

@@ -39,9 +39,9 @@ beforeAll(async () => {
   expectedHtml = await readFile(expectedFixtureDirName, htmlFileName);
 });
 
-let outPutTempDirPath;
+let outputTempDirPath;
 beforeEach(async () => {
-  outPutTempDirPath = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
+  outputTempDirPath = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
 });
 
 describe('pageLoader', () => {
@@ -50,18 +50,18 @@ describe('pageLoader', () => {
     async (fileName, _, expectedFileName) => {
       const resourceData = await readFile(beforeFixtureDirName, fileName);
       const scope = await initMockHttpRequests();
-      await pageLoader('https://ru.hexlet.io/courses', outPutTempDirPath);
+      await pageLoader('https://ru.hexlet.io/courses', outputTempDirPath);
       scope.isDone();
 
       const actualHtml = await fs.readFile(
-        path.join(outPutTempDirPath, expectedHtmlFileName),
+        path.join(outputTempDirPath, expectedHtmlFileName),
         'utf-8',
       );
 
       expect(actualHtml).toEqual(expectedHtml);
 
       const actualResource = await fs.readFile(
-        path.join(outPutTempDirPath, expectedDirName, expectedFileName),
+        path.join(outputTempDirPath, expectedDirName, expectedFileName),
         'utf-8',
       );
       expect(actualResource).toEqual(resourceData);
@@ -72,7 +72,7 @@ describe('pageLoader', () => {
     const scope = nock('https://ru.hexlet.io').get('/courses').reply(500);
 
     await expect(
-      pageLoader('https://ru.hexlet.io/courses', outPutTempDirPath),
+      pageLoader('https://ru.hexlet.io/courses', outputTempDirPath),
     ).rejects.toThrowError('Request failed with status code 500');
     scope.isDone();
   });
@@ -86,9 +86,10 @@ describe('pageLoader', () => {
   });
 
   it('throw error if output dir is not accessible', async () => {
-    await fs.chmod(outPutTempDirPath, 0o000);
+    const notAccebibleDirPath = path.join(outputTempDirPath, 'notAccebibleDir');
+    await fs.mkdir(notAccebibleDirPath, { mode: 0o000 });
     await expect(
-      fs.access(outPutTempDirPath, constants.W_OK),
+      fs.access(notAccebibleDirPath, constants.W_OK),
     ).rejects.toThrowError(
       /EACCES: permission denied/,
     );

@@ -1,4 +1,4 @@
-import { promises as fs, constants } from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
 import nock from 'nock';
 import os from 'os';
@@ -91,7 +91,7 @@ describe('pageLoader', () => {
     const { mode: mode2 } = await fs.stat(outputTempDirPath);
     expect(parseInt(mode1.toString(8), 10)).toBe(40700);
     expect(parseInt(mode2.toString(8), 10)).toBe(40000);
-    console.log(constants.W_OK);
+    expect(process.getuid()).toBe(0);
     await expect(fs.access(outputTempDirPath, 2)).rejects.toThrowError(
       /EACCES: permission denied/,
     );

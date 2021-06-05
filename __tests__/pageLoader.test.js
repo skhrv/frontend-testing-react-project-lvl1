@@ -86,13 +86,14 @@ describe('pageLoader', () => {
   });
 
   it('throw error if output dir is not accessible', async () => {
-    const notAccebibleDirPath = path.join(outputTempDirPath, 'notAccebibleDir');
-    await fs.mkdir(notAccebibleDirPath, { mode: 0o000 });
+    await fs.mkdir('outputTempDirPath', { mode: 0o000 });
     await expect(
-      fs.access(notAccebibleDirPath, constants.W_OK),
+      fs.access('outputTempDirPath', constants.W_OK),
     ).rejects.toThrowError(
       /EACCES: permission denied/,
     );
+    await fs.rmdir('outputTempDirPath');
+    console.log(os.tmpdir());
     // await initMockHttpRequests();
     // await expect(
     //   pageLoader('https://ru.hexlet.io/courses', outPutTempDirPath),

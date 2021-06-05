@@ -88,7 +88,7 @@ describe('pageLoader', () => {
   it('throw error if output dir is not accessible', async () => {
     await initMockHttpRequests();
     await expect(
-      pageLoader('https://ru.hexlet.io/courses', '/'),
+      pageLoader('https://ru.hexlet.io/courses', '/sys'),
     ).rejects.toThrowError(
       /EACCES: permission denied/,
     );

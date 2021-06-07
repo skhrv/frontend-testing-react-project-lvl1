@@ -1,11 +1,22 @@
 #!/usr/bin/env node
-import { Command } from 'commander';
+import program from 'commander';
 import pageLoader from '../src/index.js';
+import { version, description } from '../package.json';
 
-const program = new Command();
-program.option('-o, --output <type>', 'path to save file', process.cwd());
-
-program.parse(process.argv);
-const options = program.opts();
-pageLoader(program.args[0], options.output)
-  .then(() => process.exit(0)).catch(() => process.exit(1));
+program
+  .version(version, '-v')
+  .description(description)
+  .option('-o, --output <type>', 'path to save file', process.cwd())
+  .arguments('<url>')
+  .action((url, options) => {
+    pageLoader(url, options.output)
+      .then(() => {
+        console.log(
+          `Page was successfully downloaded into '${options.output}'`,
+        );
+      }).catch((e) => {
+        console.error(e.message);
+        process.exit(1);
+      });
+  })
+  .parse(process.argv);

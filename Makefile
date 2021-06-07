@@ -1,7 +1,7 @@
 install: install-deps
 
 run:
-	bin/nodejs-package.js
+	npx babel-node bin/page-loader.js
 
 install-deps:
 	npm ci

@@ -4,7 +4,6 @@ import cheerio from 'cheerio';
 import {
   extname, format, join, resolve,
 } from 'path';
-import chalk from 'chalk';
 import { URL } from 'url';
 import { constants, promises as fs } from 'fs';
 import saveFile from './saveFile.js';
@@ -15,8 +14,6 @@ import {
   log,
 } from './utils.js';
 import 'axios-debug-log';
-
-const greenCheckChar = chalk.green('\u2705 ');
 
 /**
  * @param {string} url
@@ -73,7 +70,6 @@ export default (url, outputPath = process.cwd()) => {
             });
             return axios(fullURL, { responseType: 'arraybuffer' }).then(
               ({ data }) => {
-                console.log(`${greenCheckChar} ${fullURL}`);
                 log(`${fullURL} was successfully loaded`);
 
                 return saveFile(pathToResource, data);
@@ -84,13 +80,9 @@ export default (url, outputPath = process.cwd()) => {
         .then(() => saveFile(pathToHtml, $.html()))
         .then(() => {
           log(`Page was successfully downloaded into '${outputPath}'`);
-          console.log(
-            `Page was successfully downloaded into '${outputPath}'`,
-          );
         });
     })).catch((e) => {
       log(e);
-      console.error(e.message);
       throw e;
     });
 };

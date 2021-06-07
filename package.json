@@ -1,5 +1,5 @@
 {
-  "name": "page-loader",
+  "name": "@hexlet/code",
   "version": "0.0.1",
   "description": "Local saving of the web page",
   "bin": {

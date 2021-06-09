@@ -121,6 +121,6 @@ describe('pageLoader negative case', () => {
   it('throw error if output dir is not accessible', async () => {
     await expect(
       pageLoader(fullUrl, '/sys'),
-    ).rejects.toThrowError();
+    ).rejects.toThrowError('error');
   });
 });

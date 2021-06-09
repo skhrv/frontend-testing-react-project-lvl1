@@ -69,21 +69,27 @@ beforeEach(async () => {
   outputTempDirPath = await fs.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
 });
 
-describe('pageLoader', () => {
-  it.each(testData)(
-    'page loaded and saved with resources %s',
-    async ({ fileName, expectedFileName }) => {
+describe('pageLoader positive case', () => {
+  it('page loaded', async () => {
+    const scope = await initMockHttpRequests();
+    await pageLoader(fullUrl, outputTempDirPath);
+    scope.isDone();
+
+    const actualHtml = await fs.readFile(
+      path.join(outputTempDirPath, expectedHtmlFileName),
+      'utf-8',
+    );
+
+    expect(actualHtml).toEqual(expectedHtml);
+  });
+
+  it.each(testData.map((testCase) => [testCase.fileName, testCase]))(
+    'page saved with resource %s',
+    async (_, { fileName, expectedFileName }) => {
       const resourceData = await readFile(beforeFixtureDirName, fileName);
       const scope = await initMockHttpRequests();
       await pageLoader(fullUrl, outputTempDirPath);
       scope.isDone();
-
-      const actualHtml = await fs.readFile(
-        path.join(outputTempDirPath, expectedHtmlFileName),
-        'utf-8',
-      );
-
-      expect(actualHtml).toEqual(expectedHtml);
 
       const actualResource = await fs.readFile(
         path.join(outputTempDirPath, expectedDirName, expectedFileName),
@@ -92,7 +98,9 @@ describe('pageLoader', () => {
       expect(actualResource).toEqual(resourceData);
     },
   );
+});
 
+describe('pageLoader negative case', () => {
   it('throw error if page not exist', async () => {
     const scope = nock(baseUrl).get('/courses').reply(500);
 

@@ -10,9 +10,9 @@ program
   .arguments('<url>')
   .action((url, options) => {
     pageLoader(url, options.output)
-      .then(() => {
+      .then((res) => {
         console.log(
-          `Page was successfully downloaded into '${options.output}'`,
+          `Page was successfully downloaded '${res.filepath}'`,
         );
       }).catch((e) => {
         console.error(e.message);

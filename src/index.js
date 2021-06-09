@@ -80,7 +80,7 @@ export default (url, outputPath = process.cwd()) => {
         .then(() => saveFile(pathToHtml, $.html()))
         .then(() => {
           log(`Page was successfully downloaded into '${outputPath}'`);
-          return { filepath: outputPath };
+          return { filepath: pathToHtml };
         });
     })).catch((e) => {
       log(e);

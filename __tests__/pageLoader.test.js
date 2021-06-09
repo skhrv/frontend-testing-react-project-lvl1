@@ -113,12 +113,12 @@ describe('pageLoader negative case', () => {
   it('throw error if output dir is not exist', async () => {
     await expect(
       pageLoader(fullUrl, 'notExistedDir'),
-    ).rejects.toThrowError(/ENOENT/);
+    ).rejects.toThrowError(/ENOENT/i);
   });
 
   it('throw error if output dir is not accessible', async () => {
     await expect(
       pageLoader(fullUrl, '/sys'),
-    ).rejects.toThrowError(/EROFS/);
+    ).rejects.toThrowError(/EROFS/i);
   });
 });

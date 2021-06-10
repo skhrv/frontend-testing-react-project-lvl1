@@ -71,9 +71,8 @@ beforeEach(async () => {
 
 describe('pageLoader positive case', () => {
   it('page loaded', async () => {
-    const scope = await initMockHttpRequests();
+    await initMockHttpRequests();
     await pageLoader(fullUrl, outputTempDirPath);
-    scope.done();
 
     const actualHtml = await fs.readFile(
       path.join(outputTempDirPath, expectedHtmlFileName),
@@ -88,7 +87,7 @@ describe('pageLoader positive case', () => {
     async ({ fileName, expectedFileName }) => {
       const resourceData = await readFile(beforeFixtureDirName, fileName);
       await initMockHttpRequests();
-      // await pageLoader(fullUrl, outputTempDirPath);
+      await pageLoader(fullUrl, outputTempDirPath);
 
       const actualResource = await fs.readFile(
         path.join(outputTempDirPath, expectedDirName, expectedFileName),

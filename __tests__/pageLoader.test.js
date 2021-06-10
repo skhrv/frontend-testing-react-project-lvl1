@@ -22,7 +22,7 @@ const getFixturePath = (fixtureDirName, filename) => path.join(__dirname, '..', 
 const readFile = (fixtureDirName, filename) => fs.readFile(getFixturePath(fixtureDirName, filename), 'utf-8');
 
 const prefix = 'ru-hexlet-io';
-const testsData = [
+const testsResources = [
   {
     fileName: 'courses.html',
     resourceURI: routePath,
@@ -51,7 +51,7 @@ const testsData = [
 
 const initMockHttpRequests = async () => {
   const scope = nock(baseUrl);
-  await Promise.all(testsData.map(async ({ fileName, resourceURI, repeatTimes }) => {
+  await Promise.all(testsResources.map(async ({ fileName, resourceURI, repeatTimes }) => {
     const resourceData = await readFile(beforeFixtureDirName, fileName);
     scope.get(resourceURI).times(repeatTimes).reply(200, resourceData);
   }));
@@ -73,7 +73,7 @@ describe('pageLoader positive case', () => {
   it('page loaded', async () => {
     const scope = await initMockHttpRequests();
     await pageLoader(fullUrl, outputTempDirPath);
-    scope.isDone();
+    scope.done();
 
     const actualHtml = await fs.readFile(
       path.join(outputTempDirPath, expectedHtmlFileName),
@@ -83,13 +83,12 @@ describe('pageLoader positive case', () => {
     expect(actualHtml).toEqual(expectedHtml);
   });
 
-  it.each(testsData.map((testCaseData) => [testCaseData.fileName, testCaseData]))(
-    'page saved with resource %s',
-    async (_, { fileName, expectedFileName }) => {
+  it.each(testsResources)(
+    'page saved with resource $fileName',
+    async ({ fileName, expectedFileName }) => {
       const resourceData = await readFile(beforeFixtureDirName, fileName);
-      const scope = await initMockHttpRequests();
-      await pageLoader(fullUrl, outputTempDirPath);
-      scope.isDone();
+      await initMockHttpRequests();
+      // await pageLoader(fullUrl, outputTempDirPath);
 
       const actualResource = await fs.readFile(
         path.join(outputTempDirPath, expectedDirName, expectedFileName),

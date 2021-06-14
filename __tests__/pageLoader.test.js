@@ -115,8 +115,9 @@ describe('pageLoader negative case', () => {
   });
 
   it('throw error if output dir is not accessible', async () => {
+    await fs.chmod(outputTempDirPath, 0);
     await expect(
-      pageLoader(fullUrl, '/sys'),
-    ).rejects.toThrowError(/EROFS/i);
+      pageLoader('https://ru.hexlet.io/courses', outputTempDirPath),
+    ).rejects.toThrowError(/EACCES/i);
   });
 });

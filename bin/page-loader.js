@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 import program from 'commander';
 import pageLoader from '../src/index.js';
-import { version, description } from '../package.json';
 
 program
-  .version(version, '-v')
-  .description(description)
+  .version('0.0.1', '-v')
+  .description('Local saving of the web page')
   .option('-o, --output <type>', 'path to save file', process.cwd())
   .arguments('<url>')
   .action((url, options) => {
